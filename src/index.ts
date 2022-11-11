@@ -1,27 +1,49 @@
 import http from 'http';
+import url from 'url';
 import * as dotenv from 'dotenv';
-const numberA = 5;
-const numberB = 6;
-const sum = numberA + numberB;
-const rest = numberA - numberB;
-const multiply = numberA * numberB;
-const divison = numberA / numberB;
-
 dotenv.config();
-const port = 3100;
+
+const port = process.env.PORT || 3500;
+
 const server = http.createServer((request, response) => {
-    request.method;
+    const queryObject = url.parse(request.url as string, true).query;
+    if (url.parse(request.url as string, true).pathname !== '/index.js') {
+        response.writeHead(404, { 'content-type': 'text-html' });
+        response.write('Error404');
+        response.end();
+    }
+    if (!Number(queryObject.num1) || !Number(queryObject.num2)) {
+        response.writeHead(500, { 'content-type': 'text-html' });
+        response.write('Por favor introduzca solo numeros');
+        response.end();
+    }
 
-    request.url;
+    if (Number(queryObject.num1) && Number(queryObject.num2)) {
+        const sum = Number(queryObject.num1) + Number(queryObject.num2);
+        const result = `${Number(queryObject.num1)} +
+        ${Number(queryObject.num2)} =
+        ${sum}`;
+        const rest = Number(queryObject.num1) - Number(queryObject.num2);
+        const resultRest = `${Number(queryObject.num1)} -
+        ${Number(queryObject.num2)} =
+        ${rest}`;
+        const multiply = Number(queryObject.num1) * Number(queryObject.num2);
+        const resultMultiply = `${Number(queryObject.num1)} x
+        ${Number(queryObject.num2)} =
+        ${multiply}`;
+        const division = Number(queryObject.num1) / Number(queryObject.num2);
+        const resultDivision = `${Number(queryObject.num1)} /
+        ${Number(queryObject.num2)} =
+        ${division}`;
+        response.writeHead(200, { 'content-type': 'text-html' });
+        response.write('<div>calculator</div>');
+        response.write(`<p>your sum: ${result}</p>`);
+        response.write(`<p>your Rest: ${resultRest}</p>`);
+        response.write(`<p>your multiplication: ${resultMultiply}</p>`);
+        response.write(`<p>your division: ${resultDivision}</p>`);
 
-    response.write(`${numberA} + ${numberB} = ${sum}`);
-    response.write('        ');
-    response.write(`${numberA} - ${numberB} = ${rest}`);
-    response.write('        ');
-    response.write(`${numberA} * ${numberB} = ${multiply}`);
-    response.write('        ');
-    response.write(`${numberA} / ${numberB} = ${divison}`);
-    response.end();
+        response.end();
+    }
 });
 
 server.listen(port);
